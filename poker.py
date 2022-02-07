@@ -1,3 +1,5 @@
+# Python 3.9
+
 # Poker Game
 from collections import Counter
 import os
@@ -76,12 +78,36 @@ class Deck:
 
 # Player Class
 class Player:
-    def __init__(self):
+    def __init__(self, index):
+        self.name = "Jugador " + str(index)
         self.balance = 500
         self.cards = []
 
-    # player show balance
-    def showBalance(self):
+    # player check
+    def check(self):
+        return 0
+
+    # player call
+    def call(self, amount):
+        self.balance -= amount
+        return amount
+
+    # player bet
+    def bet(self, amount):
+        self.balance -= amount
+        return amount
+
+    # player fold
+    def fold(self):
+        return 0 
+
+    # player raise
+    def raiseBet(self, amount):
+        self.balance -= amount
+        return amount
+
+    # player balance
+    def getBalance(self):
         return self.balance
 
     # deal card
@@ -118,10 +144,17 @@ class Player:
     def checkHand(self, community_cards):
         conmute_cards = self.cards + community_cards
 
+        conmute_cards.sort(key=lambda x: x.rank)
+
         # check for three of a kind
-        three_of_a_kind = self.checkForThreeOfAKind(conmute_cards)
+        three_of_a_kind = self.checkThreeOfAKind(conmute_cards)
         if three_of_a_kind:
-            return (3, three_of_a_kind)
+            return (4, three_of_a_kind)
+
+        # check for double pair
+        doublePair = self.checkDoublePair(conmute_cards)
+        if doublePair:
+            return (3, doublePair)
 
         # check for pair
         pair = self.checkPair(conmute_cards)
@@ -134,7 +167,7 @@ class Player:
             return (1, high)
 
     # check for three of a kind
-    def checkForThreeOfAKind(self, conmute_cards):
+    def checkThreeOfAKind(self, conmute_cards):
         cards = []
         for card in conmute_cards:
             cards.append(card.rank)
@@ -144,6 +177,22 @@ class Player:
         for item in group:
             if item[1] == 3:
                 return (item[0])
+
+    # check for double pair
+    def checkDoublePair(self, conmute_cards):
+        cards = []
+        for card in conmute_cards:
+            cards.append(card.rank)
+
+        group = Counter(cards).items()
+
+        pairs = []
+        for item in group:
+            if item[1] == 2:
+                pairs.append(item[0])
+
+            if len(pairs) == 2:
+                return pairs
 
     # check for pair
     def checkPair(self, conmute_cards):
@@ -176,12 +225,42 @@ class Game:
             hands.append(player.checkHand(self.community_cards))
 
         #print(hands)
-        
-        print("Gana: Jugador " + str(hands.index(max(hands))+1))
+        bestHand = max(hands)
+        handType = ""
+
+        if bestHand[0] == 1:
+            handType = "Carta alta"
+        elif bestHand[0] == 2:
+            handType = "Pareja"
+        elif bestHand[0] == 3:
+            handType = "Doble pareja"
+        elif bestHand[0] == 4:
+            handType = "Trio"
+
+        rank = bestHand[1]
+        if bestHand[1] == 1:
+            rank = "A"
+        elif bestHand[1]== 11:
+            rank = "J"
+        elif bestHand[1] == 12:
+            rank = "Q"
+        elif bestHand[1] == 13:
+            rank = "K"
+
+        winner = players[hands.index(max(hands))].name
+
+        if  bestHand[0] == 3:
+            print("Ganador: " + winner + ", con " + handType + " de " + str(rank[0]) + " y " + str(rank[1]))
+
+        else:
+            print("Ganador: " + winner + ", con " + handType + " de " + str(rank))
+
+        sleep(3)
 
     # start a game
     def start(self):
 
+        self.pot = 0
         self.community_cards = []
         self.players = []
 
@@ -201,7 +280,7 @@ class Game:
         print()
 
         for i in range(2):
-            self.players.append(Player())
+            self.players.append(Player(i+1))
 
         # deal 1st card to each player
         for player in self.players:
@@ -216,7 +295,7 @@ class Game:
             # clear console
             #os.system('cls' if os.name == 'nt' else 'clear')
             
-            print(Fore.YELLOW + f"Jugador {i+1}: " + Style.RESET_ALL)
+            print(Fore.YELLOW + player.name + Style.RESET_ALL)
             player.showCards()
 
             # print an empty line
@@ -277,3 +356,6 @@ class Game:
 # start the game   
 game = Game()
 game.start()
+
+while(1):
+    game.start()
