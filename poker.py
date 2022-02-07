@@ -175,8 +175,9 @@ class Game:
         for player in players:
             hands.append(player.checkHand(self.community_cards))
 
-        print(hands)
-        print(max(hands))
+        #print(hands)
+        
+        print("Gana: Jugador " + str(hands.index(max(hands))+1))
 
     # start a game
     def start(self):
