@@ -251,16 +251,19 @@ class Game:
 
         if  bestHand[0] == 3:
             print("Ganador: " + winner + ", con " + handType + " de " + str(rank[0]) + " y " + str(rank[1]))
-
         else:
             print("Ganador: " + winner + ", con " + handType + " de " + str(rank))
 
-        sleep(3)
+        sleep(5)
+
+    # set the pot
+    def setPot(self, amount):
+        self.pot += amount
 
     # start a game
     def start(self):
 
-        self.pot = 0
+        self.pot = 0.00
         self.community_cards = []
         self.players = []
 
