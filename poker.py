@@ -222,11 +222,39 @@ class Player:
 # Game Class
 class Game:
 
-    def __init__(self):
-        self.players = []
-        for i in range(2):
-            self.players.append(Player(i+1))
+    def welcome(self):
+        print(Fore.GREEN + """
+ _____      _              
+|  __ \    | |             
+| |__) |__ | | _____ _ __  
+|  ___/ _ \| |/ / _ \ '__| 
+| |  | (_) |   <  __/ |    
+|_|   \___/|_|\_\___|_|    
+""")
+        print("==========================" + Style.RESET_ALL)
 
+    def init(self):
+
+        self.players = []
+
+        # create players
+        nPlayers = input("Número de jugadores (2 - 8): ")
+        if nPlayers:
+            nPlayers = int(nPlayers)
+            if nPlayers >= 2 and nPlayers <= 8:
+                for i in range(nPlayers):
+                    tmpPlayer = Player(i+1)
+                    tmpName = input("Nombre del jugador " + str(i+1) + ": ")
+                    if tmpName:
+                        tmpPlayer.name = tmpName
+                    self.players.append(tmpPlayer)
+            else:
+                print(Fore.RED + "Número de jugadores debe ser entre 1 y 8\n" + Style.RESET_ALL)
+                self.init()
+        else:
+            print(Fore.RED + "Número de jugadores debe ser entre 1 y 8\n" + Style.RESET_ALL)
+            self.init()
+            
     # set dealer player
     def setDealer(self, player):
         self.dealer = player
@@ -236,8 +264,31 @@ class Game:
         print("1. Pasar\n2. Ir\n3. Apostar\n4. No Ir\n5. Subir\n")
         opt = input("Opción: ")
 
+        if opt == "1":
+            return 0
+
         if opt == "2":
-            self.pot += player.bet(50)
+            self.pot += player.bet(self.smallBlind)
+
+        elif opt == "3":
+            self.pot += player.bet(100)
+
+        elif opt == "4":
+            player.fold()
+
+        elif opt == "5":
+            player.raiseBet(self.bigBlind)
+
+    # game turn
+    def blindTurn(self, player):
+        print("1. Ir\n2. No Ir\n")
+        opt = input("Opción: ")
+
+        if opt == "1":
+            self.pot += player.bet(self.smallBlind)
+
+        if opt == "2":
+            player.fold()
 
     # check for winner
     def checkWinner(self, players):
@@ -289,12 +340,12 @@ class Game:
         # win the pot
         winner.balance += self.pot
 
-        print(winner.name + " gana, el bote de: " + "Q" + str(self.pot))
+        print(winner.name + " gana el bote de: " + "Q" + str(self.pot))
 
         # print an empty line
         print()
 
-        input("Presione enter para iniciar un nuevo juego o esc para salir...")
+        input(Fore.YELLOW + "Presione enter para iniciar un nuevo juego o esc para salir..." + Style.RESET_ALL)
         
     # set the pot
     def setPot(self, amount):
@@ -306,9 +357,14 @@ class Game:
         self.pot = 0
         self.community_cards = []
         self.setDealer(self.players[0])
+        self.smallBlind = 10
+        self.bigBlind = 20
 
         # clear console
         os.system('cls' if os.name == 'nt' else 'clear')
+
+        # welcome message
+        self.welcome()
 
         self.deck = Deck()
         self.deck.shuffle()
@@ -335,6 +391,21 @@ class Game:
             # clear console
             os.system('cls' if os.name == 'nt' else 'clear')
 
+            # welcome message
+            self.welcome()
+
+            # pot balance
+            print("Bote: " + "Q" + str(self.pot))
+
+            # print an empty line
+            print()
+
+            # turn of next player
+            input(Fore.GREEN + "Turno de " + player.name + "..." + Style.RESET_ALL)
+
+            # print an empty line
+            print()
+
             print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL + " - " + "Q" + str(player.balance))
             player.showCards()
 
@@ -343,9 +414,12 @@ class Game:
 
             # bets round
             self.gameTurn(player)
-        
+
         # clear console
-        os.system('cls' if os.name == 'nt' else 'clear')
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+        # welcome message
+        self.welcome()
 
         # deal flop cards
         flop = self.deck.deal_flop()
@@ -362,9 +436,24 @@ class Game:
             # clear console
             os.system('cls' if os.name == 'nt' else 'clear')
 
+            # welcome message
+            self.welcome()
+
+            # pot balance
+            print("Bote: " + "Q" + str(self.pot))
+
+            # print an empty line
+            print()
+
             # show floop cards
             print("Flop: ")
             self.deck.showCards(flop)
+
+            # print an empty line
+            print()
+
+            # turn of next player
+            input(Fore.GREEN + "Turno de " + player.name + "..." + Style.RESET_ALL)
 
             # print an empty line
             print()
@@ -393,6 +482,15 @@ class Game:
             # clear console
             os.system('cls' if os.name == 'nt' else 'clear')
 
+            # welcome message
+            self.welcome()
+
+            # pot balance
+            print("Bote: " + "Q" + str(self.pot))
+
+            # print an empty line
+            print()
+
             # show floop cards
             print("Flop: ")
             self.deck.showCards(flop)
@@ -403,6 +501,12 @@ class Game:
             # show turn card
             print("Turn: ")
             self.deck.showCards([turn])
+
+            # print an empty line
+            print()
+
+            # turn of next player
+            input(Fore.GREEN + "Turno de " + player.name + "..." + Style.RESET_ALL)
 
             # print an empty line
             print()
@@ -431,6 +535,15 @@ class Game:
             # clear console
             os.system('cls' if os.name == 'nt' else 'clear')
 
+            # welcome message
+            self.welcome()
+
+            # pot balance
+            print("Bote: " + "Q" + str(self.pot))
+
+            # print an empty line
+            print()
+
             # show floop cards
             print("Flop: ")
             self.deck.showCards(flop)
@@ -452,6 +565,12 @@ class Game:
             # print an empty line
             print()
 
+            # turn of next player
+            input(Fore.GREEN + "Turno de " + player.name + "..." + Style.RESET_ALL)
+
+            # print an empty line
+            print()
+
             print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL + " - " + "Q" + str(player.balance))
             player.showCards()
 
@@ -463,6 +582,15 @@ class Game:
 
         # clear console
         os.system('cls' if os.name == 'nt' else 'clear')
+
+        # welcome message
+        self.welcome()
+
+        # pot balance
+        print("Bote: " + "Q" + str(self.pot))
+
+        # print an empty line
+        print()
 
         # community cards
         print("Cartas comunitarias: ")
@@ -480,9 +608,16 @@ class Game:
         for player in self.players:
             player.clearCards()
 
-# start the game   
+# clear console
+os.system('cls' if os.name == 'nt' else 'clear')
+ 
 game = Game()
+
+# start the game 
+game.welcome() 
+game.init()
 game.start()
 
+# game loop
 while(1):
     game.start()
