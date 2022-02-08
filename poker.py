@@ -234,7 +234,10 @@ class Game:
     # game turn
     def gameTurn(self, player):
         print("1. Pasar\n2. Ir\n3. Apostar\n4. No Ir\n5. Subir\n")
-        valor = input("Opción: ")
+        opt = input("Opción: ")
+
+        if opt == "2":
+            self.pot += player.bet(50)
 
     # check for winner
     def checkWinner(self, players):
@@ -284,9 +287,9 @@ class Game:
         print()
 
         # win the pot
-        winner.balance += self.pot + 100
+        winner.balance += self.pot
 
-        print(winner.name + " gana, el bote de: " + "Q" + str(self.pot + 100))
+        print(winner.name + " gana, el bote de: " + "Q" + str(self.pot))
 
         # print an empty line
         print()
