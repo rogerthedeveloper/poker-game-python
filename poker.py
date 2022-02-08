@@ -294,8 +294,8 @@ class Game:
         # print an empty line
         print()
 
-        input("Presione enter para iniciar un nuevo juego...")
-
+        input("Presione enter para iniciar un nuevo juego o esc para salir...")
+        
     # set the pot
     def setPot(self, amount):
         self.pot += amount
@@ -305,7 +305,7 @@ class Game:
 
         self.pot = 0
         self.community_cards = []
-        self.dealer = self.players[0]
+        self.setDealer(self.players[0])
 
         # clear console
         os.system('cls' if os.name == 'nt' else 'clear')
