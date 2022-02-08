@@ -282,7 +282,7 @@ class Game:
         # print an empty line
         print()
 
-        for i in range(2):
+        for i in range(4):
             self.players.append(Player(i+1))
 
         # deal 1st card to each player
