@@ -112,7 +112,12 @@ class Player:
 
     # deal card
     def dealCard(self, card):
-        self.cards.append(card)        
+        self.cards.append(card) 
+
+    # clear player cards
+    def clearCards(self):
+        self.cards = []
+           
 
     # player show cards
     def showCards(self):
@@ -217,6 +222,15 @@ class Player:
 # Game Class
 class Game:
 
+    def __init__(self):
+        self.players = []
+        for i in range(2):
+            self.players.append(Player(i+1))
+
+    # set dealer player
+    def setDealer(self, player):
+        self.dealer = player
+
     # game turn
     def gameTurn(self, player):
         print("1. Pasar\n2. Ir\n3. Apostar\n4. No Ir\n5. Subir\n")
@@ -255,7 +269,7 @@ class Game:
         winner = players[hands.index(max(hands))]
 
         # winner player cards
-        print(Fore.YELLOW + "Cartas / " + winner.name + Style.RESET_ALL)
+        print(Fore.YELLOW + "Cartas / " + winner.name + Style.RESET_ALL + " - " + "Q" + str(winner.balance))
         winner.showCards()
 
         # print an empty line
@@ -269,6 +283,14 @@ class Game:
         # print an empty line
         print()
 
+        # win the pot
+        winner.balance += self.pot + 100
+
+        print(winner.name + " gana, el bote de: " + "Q" + str(self.pot + 100))
+
+        # print an empty line
+        print()
+
         input("Presione enter para iniciar un nuevo juego...")
 
     # set the pot
@@ -278,9 +300,9 @@ class Game:
     # start a game
     def start(self):
 
-        self.pot = 0.00
+        self.pot = 0
         self.community_cards = []
-        self.players = []
+        self.dealer = self.players[0]
 
         # clear console
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -297,9 +319,6 @@ class Game:
         # print an empty line
         print()
 
-        for i in range(2):
-            self.players.append(Player(i+1))
-
         # deal 1st card to each player
         for player in self.players:
             player.dealCard(self.deck.deal())
@@ -313,7 +332,7 @@ class Game:
             # clear console
             os.system('cls' if os.name == 'nt' else 'clear')
 
-            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL)
+            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL + " - " + "Q" + str(player.balance))
             player.showCards()
 
             # print an empty line
@@ -347,7 +366,7 @@ class Game:
             # print an empty line
             print()
 
-            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL)
+            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL + " - " + "Q" + str(player.balance))
             player.showCards()
 
             # print an empty line
@@ -385,7 +404,7 @@ class Game:
             # print an empty line
             print()
 
-            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL)
+            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL + " - " + "Q" + str(player.balance))
             player.showCards()
 
             # print an empty line
@@ -430,7 +449,7 @@ class Game:
             # print an empty line
             print()
 
-            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL)
+            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL + " - " + "Q" + str(player.balance))
             player.showCards()
 
             # print an empty line
@@ -453,6 +472,10 @@ class Game:
 
         # check players hands for a winner
         self.checkWinner(self.players)
+
+        # quit cards of all players
+        for player in self.players:
+            player.clearCards()
 
 # start the game   
 game = Game()
