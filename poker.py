@@ -217,6 +217,11 @@ class Player:
 # Game Class
 class Game:
 
+    # game turn
+    def gameTurn(self, player):
+        print("1. Pasar\n2. Ir\n3. Apostar\n4. No Ir\n5. Subir\n")
+        valor = input("Opción: ")
+
     # check for winner
     def checkWinner(self, players):
         hands = []
@@ -247,14 +252,24 @@ class Game:
         elif bestHand[1] == 13:
             rank = "K"
 
-        winner = players[hands.index(max(hands))].name
+        winner = players[hands.index(max(hands))]
+
+        # winner player cards
+        print(Fore.YELLOW + "Cartas / " + winner.name + Style.RESET_ALL)
+        winner.showCards()
+
+        # print an empty line
+        print()
 
         if  bestHand[0] == 3:
-            print("Ganador: " + winner + ", con " + handType + " de " + str(rank[0]) + " y " + str(rank[1]))
+            print("Ganador: " + winner.name + ", con " + handType + " de " + str(rank[0]) + " y " + str(rank[1]))
         else:
-            print("Ganador: " + winner + ", con " + handType + " de " + str(rank))
+            print("Ganador: " + winner.name + ", con " + handType + " de " + str(rank))
 
-        sleep(5)
+        # print an empty line
+        print()
+
+        input("Presione enter para iniciar un nuevo juego...")
 
     # set the pot
     def setPot(self, amount):
@@ -274,15 +289,15 @@ class Game:
         self.deck.shuffle()
 
         print(Fore.BLUE + "Iniciando un nuevo juego de Poker..." + Style.RESET_ALL)
-        #sleep(1)
+        sleep(1)
 
         print(Fore.GREEN + "Mezclando cartas..." + Style.RESET_ALL)
-        #sleep(1)
+        sleep(1)
 
         # print an empty line
         print()
 
-        for i in range(4):
+        for i in range(2):
             self.players.append(Player(i+1))
 
         # deal 1st card to each player
@@ -296,16 +311,19 @@ class Game:
         # loop through players
         for i, player in enumerate(self.players):
             # clear console
-            #os.system('cls' if os.name == 'nt' else 'clear')
-            
-            print(Fore.YELLOW + player.name + Style.RESET_ALL)
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL)
             player.showCards()
 
             # print an empty line
             print()
 
             # bets round
-            
+            self.gameTurn(player)
+        
+        # clear console
+        os.system('cls' if os.name == 'nt' else 'clear')
 
         # deal flop cards
         flop = self.deck.deal_flop()
@@ -318,7 +336,25 @@ class Game:
         # print an empty line
         print()
 
-        # bets round
+        for i, player in enumerate(self.players):
+            # clear console
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+            # show floop cards
+            print("Flop: ")
+            self.deck.showCards(flop)
+
+            # print an empty line
+            print()
+
+            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL)
+            player.showCards()
+
+            # print an empty line
+            print()
+
+            # bets round
+            self.gameTurn(player)
 
         # deal turn card
         turn = self.deck.deal_turn()
@@ -331,7 +367,32 @@ class Game:
         # print an empty line
         print()
 
-        # bets round
+        for i, player in enumerate(self.players):
+            # clear console
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+            # show floop cards
+            print("Flop: ")
+            self.deck.showCards(flop)
+
+            # print an empty line
+            print()
+
+            # show turn card
+            print("Turn: ")
+            self.deck.showCards([turn])
+
+            # print an empty line
+            print()
+
+            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL)
+            player.showCards()
+
+            # print an empty line
+            print()
+
+            # bets round
+            self.gameTurn(player)
 
         # deal river card
         river = self.deck.deal_river()
@@ -343,6 +404,43 @@ class Game:
 
         # print an empty line
         print()
+
+        for i, player in enumerate(self.players):
+            # clear console
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+            # show floop cards
+            print("Flop: ")
+            self.deck.showCards(flop)
+
+            # print an empty line
+            print()
+
+            # show turn card
+            print("Turn: ")
+            self.deck.showCards([turn])
+
+            # print an empty line
+            print()
+
+            # show river card
+            print("River: ")
+            self.deck.showCards([river])
+
+            # print an empty line
+            print()
+
+            print(Fore.YELLOW + "Cartas / " + player.name + Style.RESET_ALL)
+            player.showCards()
+
+            # print an empty line
+            print()
+
+            # bets round
+            self.gameTurn(player)
+
+        # clear console
+        os.system('cls' if os.name == 'nt' else 'clear')
 
         # community cards
         print("Cartas comunitarias: ")
