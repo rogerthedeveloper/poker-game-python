@@ -1,11 +1,13 @@
 # Python 3.9
 
 # Poker Game
+from cgitb import small
 from collections import Counter
 import os
 import random
 from time import sleep
 from colorama import Fore, Back, Style
+import pygame
 
 # Card Class
 class Card:
@@ -100,11 +102,6 @@ class Player:
     # player fold
     def fold(self):
         return 0 
-
-    # player raise
-    def raiseBet(self, amount):
-        self.balance -= amount
-        return amount
 
     # player balance
     def getBalance(self):
@@ -222,6 +219,9 @@ class Player:
 # Game Class
 class Game:
 
+    def getVersion(self):
+        return "0.0.1"
+
     def welcome(self):
         print(Fore.GREEN + """
  _____      _              
@@ -231,7 +231,8 @@ class Game:
 | |  | (_) |   <  __/ |    
 |_|   \___/|_|\_\___|_|    
 """)
-        print("==========================" + Style.RESET_ALL)
+        print("@rogerfsosa   Versión: " + self.getVersion())
+        print("============================" + Style.RESET_ALL)
 
     def init(self):
 
@@ -239,55 +240,76 @@ class Game:
 
         # create players
         nPlayers = input("Número de jugadores (2 - 8): ")
+        # print an empty line
+        print()
         if nPlayers:
             nPlayers = int(nPlayers)
             if nPlayers >= 2 and nPlayers <= 8:
                 for i in range(nPlayers):
                     tmpPlayer = Player(i+1)
+                    tmpPlayer.id = i+1
                     tmpName = input("Nombre del jugador " + str(i+1) + ": ")
                     if tmpName:
                         tmpPlayer.name = tmpName
                     self.players.append(tmpPlayer)
+                    self.dealer = 0
             else:
                 print(Fore.RED + "Número de jugadores debe ser entre 1 y 8\n" + Style.RESET_ALL)
                 self.init()
         else:
             print(Fore.RED + "Número de jugadores debe ser entre 1 y 8\n" + Style.RESET_ALL)
             self.init()
+
+        # print an empty line
+        print()
+        
+        # ask for small blind
+        tmpSmallBlind = input("Ciega pequeña: Q")
+        if tmpSmallBlind:
+            tmpSmallBlind = int(tmpSmallBlind)
+            if tmpSmallBlind > 0 and tmpSmallBlind <= self.players[0].getBalance():
+                self.smallBlind = tmpSmallBlind
+
+        # ask for big blind
+        tmpBigBlind = input("Ciega grande: Q")
+        if tmpBigBlind:
+            tmpBigBlind = int(tmpBigBlind)
+            if tmpBigBlind > 0 and tmpBigBlind > tmpSmallBlind and tmpBigBlind <= self.players[0].getBalance():
+                self.bigBlind = tmpBigBlind
             
     # set dealer player
-    def setDealer(self, player):
-        self.dealer = player
-
-    # game turn
-    def gameTurn(self, player):
-        print("1. Pasar\n2. Ir\n3. Apostar\n4. No Ir\n5. Subir\n")
+    def setDealer(self):
+        if self.dealer < len(self.players):
+            self.dealer = self.dealer+1
+        else:
+            self.dealer = 1
+              
+    # blinds turn
+    def blindTurn(self, player):
+        print("1. Ir\n2. No ir\n3. Subir")
         opt = input("Opción: ")
 
         if opt == "1":
-            return 0
+            self.pot += player.bet(self.bigBlind)
 
         if opt == "2":
-            self.pot += player.bet(self.smallBlind)
-
-        elif opt == "3":
-            self.pot += player.bet(100)
-
-        elif opt == "4":
             player.fold()
 
-        elif opt == "5":
-            player.raiseBet(self.bigBlind)
+        elif opt == "3":
+            self.pot += player.bet(self.bigBlind * 2)
 
-    # game turn
-    def blindTurn(self, player):
-        print("1. Ir\n2. No Ir\n")
+    # bets turn
+    def betsTurn(self, player):
+        print("1. Pasar\n2. Subir\n3. Rendirse")
         opt = input("Opción: ")
 
         if opt == "1":
-            self.pot += player.bet(self.smallBlind)
+            player.check()
 
         if opt == "2":
+            self.pot += player.bet(self.smallBlind * 2)
+
+        elif opt == "3":
             player.fold()
 
     # check for winner
@@ -356,9 +378,8 @@ class Game:
 
         self.pot = 0
         self.community_cards = []
-        self.setDealer(self.players[0])
-        self.smallBlind = 10
-        self.bigBlind = 20
+        self.bigBlind = self.smallBlind * 2
+        self.setDealer()
 
         # clear console
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -371,6 +392,9 @@ class Game:
 
         print(Fore.BLUE + "Iniciando un nuevo juego de Poker..." + Style.RESET_ALL)
         sleep(1)
+
+        # print an empty line
+        print()
 
         print(Fore.GREEN + "Mezclando cartas..." + Style.RESET_ALL)
         sleep(1)
@@ -386,8 +410,12 @@ class Game:
         for player in self.players:
             player.dealCard(self.deck.deal())
 
+        # order players starting from dealer position
+        self.players.sort(key=lambda x: x.id == self.dealer, reverse=False)
+        
         # loop through players
         for i, player in enumerate(self.players):
+
             # clear console
             os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -397,11 +425,26 @@ class Game:
             # pot balance
             print("Bote: " + "Q" + str(self.pot))
 
+            # blinds
+            print("Ciegas: " + "Q" + str(self.smallBlind) + " / " + "Q" + str(self.bigBlind))
             # print an empty line
             print()
 
+            if i == 0:
+                # show who is the dealer
+                print(Fore.BLUE + self.players[-1].name + ", eres el dealer" + Style.RESET_ALL)
+
+                # print an empty line
+                print()
+            else:
+                # show who is the dealer
+                print(Fore.BLUE + self.players[-1].name + ", es el dealer" + Style.RESET_ALL)
+
+                # print an empty line
+                print()
+
             # turn of next player
-            input(Fore.GREEN + "Turno de " + player.name + "..." + Style.RESET_ALL)
+            input(Fore.GREEN + "Turno de " + player.name + ", presiona enter..." + Style.RESET_ALL)
 
             # print an empty line
             print()
@@ -412,8 +455,32 @@ class Game:
             # print an empty line
             print()
 
+            # show if is small blind
+            if i == 0:
+                print(Fore.BLUE + player.name + ", eres la ciega pequeña: Q" + str(self.smallBlind) + Style.RESET_ALL)              
+                
+                # print an empty line
+                print()
+
+                # small blind msg
+                input(Fore.GREEN + "Presiona enter para colocar la ciega pequeña..." + Style.RESET_ALL)
+                self.pot += player.bet(self.smallBlind)
+                continue
+
+            # show if is big blind
+            if i == 1:
+                print(Fore.BLUE + player.name + ", eres la ciega grande: Q" + str(self.bigBlind) + Style.RESET_ALL)              
+                
+                # print an empty line
+                print()
+
+                # big blind msg
+                input(Fore.GREEN + "Presiona enter para colocar la ciega grande..." + Style.RESET_ALL)
+                self.pot += player.bet(self.bigBlind)
+                continue
+
             # bets round
-            self.gameTurn(player)
+            self.blindTurn(player)
 
         # clear console
             os.system('cls' if os.name == 'nt' else 'clear')
@@ -453,7 +520,7 @@ class Game:
             print()
 
             # turn of next player
-            input(Fore.GREEN + "Turno de " + player.name + "..." + Style.RESET_ALL)
+            input(Fore.GREEN + "Turno de " + player.name + ", presiona enter..." + Style.RESET_ALL)
 
             # print an empty line
             print()
@@ -465,7 +532,7 @@ class Game:
             print()
 
             # bets round
-            self.gameTurn(player)
+            self.betsTurn(player)
 
         # deal turn card
         turn = self.deck.deal_turn()
@@ -506,7 +573,7 @@ class Game:
             print()
 
             # turn of next player
-            input(Fore.GREEN + "Turno de " + player.name + "..." + Style.RESET_ALL)
+            input(Fore.GREEN + "Turno de " + player.name + ", presiona enter..." + Style.RESET_ALL)
 
             # print an empty line
             print()
@@ -518,7 +585,7 @@ class Game:
             print()
 
             # bets round
-            self.gameTurn(player)
+            self.betsTurn(player)
 
         # deal river card
         river = self.deck.deal_river()
@@ -566,7 +633,7 @@ class Game:
             print()
 
             # turn of next player
-            input(Fore.GREEN + "Turno de " + player.name + "..." + Style.RESET_ALL)
+            input(Fore.GREEN + "Turno de " + player.name + ", presiona enter..." + Style.RESET_ALL)
 
             # print an empty line
             print()
@@ -578,7 +645,7 @@ class Game:
             print()
 
             # bets round
-            self.gameTurn(player)
+            self.betsTurn(player)
 
         # clear console
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -610,7 +677,7 @@ class Game:
 
 # clear console
 os.system('cls' if os.name == 'nt' else 'clear')
- 
+
 game = Game()
 
 # start the game 
