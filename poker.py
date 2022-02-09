@@ -1,7 +1,6 @@
 # Python 3.9
 
 # Poker Game
-from cgitb import small
 from collections import Counter
 import os
 import random
@@ -344,17 +343,17 @@ class Game:
 
         winner = players[hands.index(max(hands))]
 
-        # winner player cards
-        print(Fore.YELLOW + "Cartas / " + winner.name + Style.RESET_ALL + " - " + "Q" + str(winner.balance))
-        winner.showCards()
-
-        # print an empty line
-        print()
-
         if  bestHand[0] == 3:
             print("Ganador: " + winner.name + ", con " + handType + " de " + str(rank[0]) + " y " + str(rank[1]))
         else:
             print("Ganador: " + winner.name + ", con " + handType + " de " + str(rank))
+
+        # print an empty line
+        print()
+
+        # winner player cards
+        print(Fore.YELLOW + "Cartas / " + winner.name + Style.RESET_ALL + " - " + "Q" + str(winner.balance))
+        winner.showCards()
 
         # print an empty line
         print()
