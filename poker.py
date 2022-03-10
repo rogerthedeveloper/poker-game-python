@@ -253,10 +253,10 @@ class Game:
                     self.players.append(tmpPlayer)
                     self.dealer = 0
             else:
-                print(Fore.RED + "Número de jugadores debe ser entre 1 y 8\n" + Style.RESET_ALL)
+                print(Fore.RED + "Número de jugadores debe ser entre 2 y 8\n" + Style.RESET_ALL)
                 self.init()
         else:
-            print(Fore.RED + "Número de jugadores debe ser entre 1 y 8\n" + Style.RESET_ALL)
+            print(Fore.RED + "Número de jugadores debe ser entre 2 y 8\n" + Style.RESET_ALL)
             self.init()
 
         # print an empty line
