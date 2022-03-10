@@ -435,7 +435,7 @@ class Game:
 
                 # print an empty line
                 print()
-            else:
+            elif i < (len(self.players) - 1):
                 # show who is the dealer
                 print(Fore.BLUE + self.players[-1].name + ", es el dealer" + Style.RESET_ALL)
 
