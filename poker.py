@@ -147,10 +147,20 @@ class Player:
 
         conmute_cards.sort(key=lambda x: x.rank)
 
+        # TODO: check for royal flush
+
+        # TODO: check for straight flush
+
         # check for poker hand
         poker_hand = self.checkPokerHand(conmute_cards)
         if poker_hand:
-            return (5, poker_hand)
+            return (8, poker_hand)
+
+        # TODO: check for full house
+
+        # TODO: check for flush
+
+        # TODO: check for straight
 
         # check for three of a kind
         three_of_a_kind = self.checkThreeOfAKind(conmute_cards)
