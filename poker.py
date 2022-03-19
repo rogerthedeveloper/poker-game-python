@@ -147,6 +147,11 @@ class Player:
 
         conmute_cards.sort(key=lambda x: x.rank)
 
+        # check for poker hand
+        poker_hand = self.checkPokerHand(conmute_cards)
+        if poker_hand:
+            return (5, poker_hand)
+
         # check for three of a kind
         three_of_a_kind = self.checkThreeOfAKind(conmute_cards)
         if three_of_a_kind:
@@ -166,6 +171,18 @@ class Player:
         high = self.checkHighCard(conmute_cards)
         if high:
             return (1, high)
+
+    # check for poker hand
+    def checkPokerHand(self, conmute_cards):
+        cards = []
+        for card in conmute_cards:
+            cards.append(card.rank)
+
+        group = Counter(cards).items()
+
+        for item in group:
+            if item[1] == 4:
+                return (item[0])
 
     # check for three of a kind
     def checkThreeOfAKind(self, conmute_cards):
